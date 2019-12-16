@@ -1,7 +1,7 @@
 let valid = false
 
 const sudoku = (matrix) => {
-  if (validateRow(matrix) && validateColumn(matrix)){
+  if (validateRow(matrix) && validateColumn(matrix) && validateGrid(matrix)){
     return true;
   } else{
     return false;
@@ -37,30 +37,40 @@ const validateColumn = matrix => {
 }
 
 const validateGrid = matrix => {
-  let compare = 3;
-  let gridArray =[]
-  for (let index in matrix){
-    // del 0 al 8, length 9
-    if (index < compare){
-      for (let element of matrix){
-        console.log(element)
-        gridArray.push(element[index])
-      }
-      //console.log(gridArray)
-    }
+  groupOfColumns1  = [];
+  groupOfColumns2  = [];
+  groupOfColumns3  = [];
+  columnSudokuStart = 0
+  columnSudokuEnd = 3
+  for (let element of matrix){
+    groupOfColumns1.push(element.slice(columnSudokuStart, columnSudokuEnd));
+    groupOfColumns2.push(element.slice(columnSudokuStart + 3, columnSudokuEnd + 3));
+    groupOfColumns3.push(element.slice(columnSudokuStart + 6, columnSudokuEnd + 6));
   }
-}
-let array = [
-  [5, 3, 4, 6, 7, 8, 9, 1, 2],
-  [6, 7, 2, 1, 9, 5, 3, 4, 8],
-  [1, 9, 8, 3, 4, 2, 5, 6, 7],
-  [8, 5, 9, 7, 6, 1, 4, 2, 3],
-  [4, 2, 6, 8, 5, 3, 7, 9, 1],
-  [7, 1, 3, 9, 2, 4, 8, 5, 6],
-  [9, 6, 1, 5, 3, 7, 2, 8, 4],
-  [2, 8, 7, 4, 1, 9, 6, 3, 5],
-  [3, 4, 5, 2, 8, 6, 1, 7, 9]
-];
+  let allSudokuColumns = [];
+  allSudokuColumns.push(groupOfColumns1, groupOfColumns2, groupOfColumns3)
+  let sudokuColumns = [];
+  for (let elements of allSudokuColumns){
+    sudokuColumns = sudokuColumns.concat(elements)
+  }
+  for (let elements of sudokuColumns){
+    sudokuColumns = sudokuColumns.concat(elements);
+    sudokuColumns.shift(elements);
+  }
+  
 
-validateGrid(array)
+  let rowGridStart = 0;
+  let rowGridEnd = 9;
+  let grids = [];
+  for (let i = 0; i < 9; i++){
+    grids = sudokuColumns.slice(rowGridStart, rowGridEnd);
+    rowGridStart += 9;
+    rowGridEnd += 9
+    if(validateSet(new Set(grids)) === false){
+      return false;
+    } 
+  }
+  return true;
+}
+
 module.exports = sudoku;
